@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giáo dục địa phương</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #121212; /* Nền đen */
+            color: #fff;
+        }
+        #note-area {
+            flex: 3;
+            padding: 10px;
+            border-right: 1px solid #444;
+            box-sizing: border-box;
+        }
+        #note-library {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+            border-left: 1px solid #444;
+        }
+        #library-header {
+            margin-bottom: 10px;
+        }
+        #library-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            border: 1px solid #333;
+            margin-bottom: 10px;
+        }
+        #library-panel .section {
+            flex: 1;
+            margin-right: 10px;
+            color: #ddd;
+        }
+        #library-panel .section:last-child {
+            margin-right: 0;
+        }
+        #notes-list {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #1e1e1e;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+        }
+        .note-name {
+            flex: 1;
+            color: #ddd;
+            margin-right: 10px;
+        }
+        .view-btn, .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        .view-btn {
+            background-color: #4caf50; /* Màu xanh */
+        }
+        .view-btn:hover {
+            background-color: #388e3c;
+        }
+        .delete-btn {
+            background-color: #d32f2f; /* Màu đỏ */
+        }
+        .delete-btn:hover {
+            background-color: #b71c1c;
+        }
+        textarea {
+            width: 100%;
+            height: calc(100% - 20px);
+            font-size: 16px;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #1e1e1e;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+        #save-btn {
+            width: 100%;
+            padding: 7px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        #save-btn:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <div id="note-area">
+        <textarea id="note-input" placeholder="Nhập ghi chú..."></textarea>
+    </div>
+    <div id="note-library">
+        <div id="library-header">
+            <h2>Thư viện</h2>
+            <div id="library-panel">
+                <div class="section">Tên thư viện</div>
+                <div class="section">Tùy chọn</div>
+            </div>
+        </div>
+        <div id="notes-list"></div>
+        <button id="save-btn">Lưu Ghi Chú</button>
+    </div>
+
+    <script>
+        const noteInput = document.getElementById('note-input');
+        const saveBtn = document.getElementById('save-btn');
+        const notesList = document.getElementById('notes-list');
+        let notes = {};
+
+        function renderNotes() {
+            notesList.innerHTML = '';
+            Object.keys(notes).forEach(noteName => {
+                const noteItem = document.createElement('div');
+                noteItem.className = 'note-item';
+                noteItem.innerHTML = `
+                    <div class="note-name">${noteName}</div>
+                    <button class="view-btn" onclick="openNote('${noteName}')">Xem</button>
+                    <button class="delete-btn" onclick="deleteNote('${noteName}')">Xóa</button>
+                `;
+                notesList.appendChild(noteItem);
+            });
+        }
+
+        function saveNote() {
+            const noteName = prompt('Nhập tên cho ghi chú:');
+            if (noteName) {
+                notes[noteName] = noteInput.value;
+                renderNotes();
+            }
+        }
+
+        function openNote(noteName) {
+            const noteContent = notes[noteName] || '';
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                <html>
+                    <head>
+                        <title>${noteName}</title>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                padding: 20px;
+                                background-color: #1e1e1e;
+                                color: #fff;
+                            }
+                            pre {
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                                font-size: 16px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <pre>${noteContent}</pre>
+                    </body>
+                </html>
+            `);
+        }
+
+        function deleteNote(noteName) {
+            if (confirm(`Bạn có chắc chắn muốn xóa ghi chú "${noteName}"?`)) {
+                delete notes[noteName];
+                renderNotes();
+            }
+        }
+
+        saveBtn.addEventListener('click', saveNote);
+
+        // Render lần đầu (nếu có dữ liệu ban đầu)
+        renderNotes();
+    </script>
+</body>
+</html>
